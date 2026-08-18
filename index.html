@@ -258,6 +258,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
 
     <div id="best-wrap"></div>
 
+    <div class="sec-hdr"><i class="ti ti-users"></i>Seguidores totais</div>
+    <div class="plat-grid" id="seg-grid"></div>
+
     <div class="chart-card">
       <div class="sec-hdr" style="margin-bottom:.75rem;"><i class="ti ti-trending-up"></i>Evolução semanal</div>
       <div class="chart-wrap"><canvas id="views-chart"></canvas></div>
@@ -279,29 +282,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
   <div id="view-input" class="input-content" style="display:none;">
     <div class="admin-card">
       <div class="admin-card-title"><i class="ti ti-calendar"></i>Período da semana</div>
-      <div class="form-grid-2">
-        <div class="ff"><label>Data início</label><input type="date" id="f-week-start" style="color-scheme:dark;"/></div>
+      <div class="form-grid-2" style="margin-bottom:.625rem;">
+        <div class="ff"><label>Data início</label><input type="date" id="f-week-start" style="color-scheme:dark;" onchange="checkExistingWeek()"/></div>
         <div class="ff"><label>Data fim</label><input type="date" id="f-week-end" style="color-scheme:dark;"/></div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:.625rem;flex-wrap:wrap;">
-        <select id="week-select-input" onchange="loadWeekInput()" style="flex:1;background:var(--bg3);border:1px solid var(--glass-b);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;-webkit-appearance:none;min-height:44px;"></select>
-        <button class="new-week-btn" onclick="addNewWeek()"><i class="ti ti-plus"></i> Nova</button>
+      <div class="ff">
+        <label>Ou carregar semana existente</label>
+        <select id="week-select-input" onchange="loadWeekInput()" style="background:var(--bg3);border:1px solid var(--glass-b);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;-webkit-appearance:none;min-height:44px;width:100%;"></select>
       </div>
+      <div id="week-status" style="font-size:11px;color:var(--text3);margin-top:6px;display:none;"></div>
     </div>
 
     <div class="admin-card">
       <div class="admin-card-title"><i class="ti ti-eye"></i>Visualizações</div>
       <div class="form-col">
         <div class="form-grid-2">
-          <div class="ff"><label>TikTok</label><input type="number" id="f-tiktok" placeholder="0" inputmode="numeric"/></div>
-          <div class="ff"><label>YouTube</label><input type="number" id="f-youtube" placeholder="0" inputmode="numeric"/></div>
+          <div class="ff"><label>TikTok views</label><input type="text" id="f-tiktok" placeholder="ex: 66.100" inputmode="numeric"/></div>
+          <div class="ff"><label>YouTube views</label><input type="text" id="f-youtube" placeholder="ex: 38.200" inputmode="numeric"/></div>
         </div>
         <div class="form-grid-2">
-          <div class="ff"><label>Instagram</label><input type="number" id="f-instagram" placeholder="0" inputmode="numeric"/></div>
+          <div class="ff"><label>Instagram views</label><input type="text" id="f-instagram" placeholder="ex: 12.000" inputmode="numeric"/></div>
           <div class="ff"><label>Melhor plataforma</label>
             <select id="f-melhor"><option value="">Selecione...</option><option value="tiktok">TikTok</option><option value="youtube">YouTube</option><option value="instagram">Instagram</option></select>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="admin-card-title"><i class="ti ti-users"></i>Seguidores totais</div>
+      <div class="form-col">
+        <div class="form-grid-2">
+          <div class="ff"><label>TikTok</label><input type="text" id="f-seg-tiktok" placeholder="ex: 2.800" inputmode="numeric"/></div>
+          <div class="ff"><label>YouTube</label><input type="text" id="f-seg-youtube" placeholder="ex: 229" inputmode="numeric"/></div>
+        </div>
+        <div class="ff" style="max-width:50%;padding-right:4px;"><label>Instagram</label><input type="text" id="f-seg-instagram" placeholder="ex: 5.400" inputmode="numeric"/></div>
       </div>
     </div>
 
@@ -357,7 +372,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
     <div id="save-ok" class="save-ok"><i class="ti ti-circle-check"></i> Salvo com sucesso!</div>
   </div>
 
-  <div class="footer"><span>Roity © 2026</span><span>v1.2</span></div>
+  <div class="footer"><span>Roity © 2026</span><span>v1.3</span></div>
 </div>
 
 <script>
@@ -427,10 +442,21 @@ function fmtWeek(ws, we){
   return startStr+' – '+end.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
 }
 
+function parseNum(v){
+  if(!v&&v!==0)return 0;
+  const s=String(v).replace(/\./g,'').replace(',','.');
+  return parseInt(s)||0;
+}
 function fmtNum(n){
   if(!n)return '0';
-  if(n>=1000000)return (n/1000000).toFixed(1)+'M';
-  if(n>=1000)return (n/1000).toFixed(1)+' mil';
+  if(n>=1000000)return (n/1000000).toFixed(1).replace('.',',')+' M';
+  if(n>=1000)return n.toLocaleString('pt-BR')+' views';
+  return String(n);
+}
+function fmtSeg(n){
+  if(!n)return '0';
+  if(n>=1000000)return (n/1000000).toFixed(1).replace('.',',')+' M';
+  if(n>=1000)return (n/1000).toFixed(1).replace('.',',')+' mil';
   return String(n);
 }
 
@@ -506,6 +532,21 @@ function renderDashboard(){
       y:{ticks:{color:'rgba(237,233,220,0.35)',font:{size:9}},grid:{color:'rgba(255,255,255,0.03)'}}
     }}
   });
+
+  // Seguidores (última semana disponível com dados)
+  const lastWithSeg=[...weeklyData].reverse().find(x=>x.seg_tiktok||x.seg_youtube||x.seg_instagram)||w;
+  document.getElementById('seg-grid').innerHTML=[
+    {id:'tiktok',icon:'ti-brand-tiktok',name:'TikTok',sub:'seguidores',val:lastWithSeg?.seg_tiktok||0},
+    {id:'youtube',icon:'ti-brand-youtube',name:'YouTube',sub:'inscritos',val:lastWithSeg?.seg_youtube||0},
+    {id:'instagram',icon:'ti-brand-instagram',name:'Instagram',sub:'seguidores',val:lastWithSeg?.seg_instagram||0},
+  ].map(p=>`
+    <div class="plat-card">
+      <div class="plat-left">
+        <div class="plat-icon-wrap ${p.id}"><i class="ti ${p.icon}"></i></div>
+        <div><div class="plat-name">${p.name}</div><div class="plat-lbl">${p.sub}</div></div>
+      </div>
+      <div class="plat-views">${fmtSeg(p.val)}</div>
+    </div>`).join('');
 
   // Meta
   const totMeta=weeklyData.length*84;
@@ -591,6 +632,64 @@ function loadWeekInput(){
   document.getElementById('f-top3-link').value=w.top3_link||'';
   document.getElementById('f-top3-plat').value=w.top3_plataforma||'';
   document.getElementById('f-top3-views').value=w.top3_views||'';
+  document.getElementById('f-seg-tiktok').value=w.seg_tiktok||'';
+  document.getElementById('f-seg-youtube').value=w.seg_youtube||'';
+  document.getElementById('f-seg-instagram').value=w.seg_instagram||'';
+  // Mostrar status
+  const st=document.getElementById('week-status');
+  st.style.display='block';
+  st.innerHTML='<i class="ti ti-check" style="color:var(--success2);"></i> Semana carregada: '+fmtWeek(w.week_start,w.week_end);
+}
+
+function checkExistingWeek(){
+  const ws=document.getElementById('f-week-start').value;
+  if(!ws)return;
+  const existing=weeklyData.find(w=>w.week_start===ws);
+  const st=document.getElementById('week-status');
+  if(existing){
+    loadWeekFromData(existing);
+    document.getElementById('week-select-input').value=ws;
+    st.style.display='block';
+    st.innerHTML='<i class="ti ti-info-circle" style="color:var(--gold);"></i> Semana existente carregada para edição.';
+  } else {
+    // Limpar campos para nova semana
+    ['f-tiktok','f-youtube','f-instagram','f-postados','f-produzidos','f-dias-falha',
+     'f-top1-link','f-top1-views','f-top2-link','f-top2-views','f-top3-link','f-top3-views',
+     'f-seg-tiktok','f-seg-youtube','f-seg-instagram'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.value='';
+    });
+    ['f-melhor','f-top1-plat','f-top2-plat','f-top3-plat'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.value='';
+    });
+    document.getElementById('f-justificativa').value='';
+    st.style.display='block';
+    st.innerHTML='<i class="ti ti-plus" style="color:var(--success2);"></i> Nova semana — preencha os dados e salve.';
+  }
+}
+
+function loadWeekFromData(w){
+  document.getElementById('f-week-start').value=w.week_start||'';
+  document.getElementById('f-week-end').value=w.week_end||'';
+  document.getElementById('f-tiktok').value=w.views_tiktok||'';
+  document.getElementById('f-youtube').value=w.views_youtube||'';
+  document.getElementById('f-instagram').value=w.views_instagram||'';
+  document.getElementById('f-melhor').value=w.melhor_plataforma||'';
+  document.getElementById('f-postados').value=w.videos_postados||'';
+  document.getElementById('f-produzidos').value=w.videos_produzidos||'';
+  document.getElementById('f-dias-falha').value=w.dias_falha||'';
+  document.getElementById('f-justificativa').value=w.justificativa_falha||'';
+  document.getElementById('f-top1-link').value=w.top1_link||'';
+  document.getElementById('f-top1-plat').value=w.top1_plataforma||'';
+  document.getElementById('f-top1-views').value=w.top1_views||'';
+  document.getElementById('f-top2-link').value=w.top2_link||'';
+  document.getElementById('f-top2-plat').value=w.top2_plataforma||'';
+  document.getElementById('f-top2-views').value=w.top2_views||'';
+  document.getElementById('f-top3-link').value=w.top3_link||'';
+  document.getElementById('f-top3-plat').value=w.top3_plataforma||'';
+  document.getElementById('f-top3-views').value=w.top3_views||'';
+  document.getElementById('f-seg-tiktok').value=w.seg_tiktok||'';
+  document.getElementById('f-seg-youtube').value=w.seg_youtube||'';
+  document.getElementById('f-seg-instagram').value=w.seg_instagram||'';
 }
 
 function addNewWeek(){
@@ -609,18 +708,22 @@ async function saveWeekData(){
   if(!sel.value)return;
   const weekStart=document.getElementById('f-week-start').value||sel.value;
   const weekEnd=document.getElementById('f-week-end').value||'';
+  const g=id=>document.getElementById(id).value;
   const data={week_start:weekStart,week_end:weekEnd,
-    views_tiktok:parseInt(document.getElementById('f-tiktok').value)||0,
-    views_youtube:parseInt(document.getElementById('f-youtube').value)||0,
-    views_instagram:parseInt(document.getElementById('f-instagram').value)||0,
-    melhor_plataforma:document.getElementById('f-melhor').value,
-    videos_postados:parseInt(document.getElementById('f-postados').value)||0,
-    videos_produzidos:parseInt(document.getElementById('f-produzidos').value)||0,
-    dias_falha:document.getElementById('f-dias-falha').value,
-    justificativa_falha:document.getElementById('f-justificativa').value,
-    top1_link:document.getElementById('f-top1-link').value,top1_plataforma:document.getElementById('f-top1-plat').value,top1_views:parseInt(document.getElementById('f-top1-views').value)||0,
-    top2_link:document.getElementById('f-top2-link').value,top2_plataforma:document.getElementById('f-top2-plat').value,top2_views:parseInt(document.getElementById('f-top2-views').value)||0,
-    top3_link:document.getElementById('f-top3-link').value,top3_plataforma:document.getElementById('f-top3-plat').value,top3_views:parseInt(document.getElementById('f-top3-views').value)||0,
+    views_tiktok:parseNum(g('f-tiktok')),
+    views_youtube:parseNum(g('f-youtube')),
+    views_instagram:parseNum(g('f-instagram')),
+    melhor_plataforma:g('f-melhor'),
+    videos_postados:parseNum(g('f-postados')),
+    videos_produzidos:parseNum(g('f-produzidos')),
+    dias_falha:g('f-dias-falha'),
+    justificativa_falha:g('f-justificativa'),
+    top1_link:g('f-top1-link'),top1_plataforma:g('f-top1-plat'),top1_views:parseNum(g('f-top1-views')),
+    top2_link:g('f-top2-link'),top2_plataforma:g('f-top2-plat'),top2_views:parseNum(g('f-top2-views')),
+    top3_link:g('f-top3-link'),top3_plataforma:g('f-top3-plat'),top3_views:parseNum(g('f-top3-views')),
+    seg_tiktok:parseNum(g('f-seg-tiktok')),
+    seg_youtube:parseNum(g('f-seg-youtube')),
+    seg_instagram:parseNum(g('f-seg-instagram')),
     updated_at:new Date().toISOString()};
   const{error}=await sb.from('tony_weekly_report').upsert(data,{onConflict:'week_start'});
   if(!error){
