@@ -277,9 +277,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
 
   <!-- INPUT (admin) -->
   <div id="view-input" class="input-content" style="display:none;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <select id="week-select-input" onchange="loadWeekInput()" style="flex:1;background:var(--bg3);border:1px solid var(--glass-b);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;-webkit-appearance:none;min-height:44px;"></select>
-      <button class="new-week-btn" onclick="addNewWeek()"><i class="ti ti-plus"></i> Nova semana</button>
+    <div class="admin-card">
+      <div class="admin-card-title"><i class="ti ti-calendar"></i>Período da semana</div>
+      <div class="form-grid-2">
+        <div class="ff"><label>Data início</label><input type="date" id="f-week-start" style="color-scheme:dark;"/></div>
+        <div class="ff"><label>Data fim</label><input type="date" id="f-week-end" style="color-scheme:dark;"/></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:.625rem;flex-wrap:wrap;">
+        <select id="week-select-input" onchange="loadWeekInput()" style="flex:1;background:var(--bg3);border:1px solid var(--glass-b);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;-webkit-appearance:none;min-height:44px;"></select>
+        <button class="new-week-btn" onclick="addNewWeek()"><i class="ti ti-plus"></i> Nova</button>
+      </div>
     </div>
 
     <div class="admin-card">
@@ -350,7 +357,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
     <div id="save-ok" class="save-ok"><i class="ti ti-circle-check"></i> Salvo com sucesso!</div>
   </div>
 
-  <div class="footer"><span>Roity © 2026</span><span>v1.1</span></div>
+  <div class="footer"><span>Roity © 2026</span><span>v1.2</span></div>
 </div>
 
 <script>
@@ -409,10 +416,15 @@ async function loadAllData(){
   weeklyData=data||[];
 }
 
-function fmtWeek(ws){
+function fmtWeek(ws, we){
   const d=new Date(ws+'T12:00:00');
+  const startStr=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  if(we){
+    const e=new Date(we+'T12:00:00');
+    return startStr+' – '+e.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  }
   const end=new Date(d);end.setDate(end.getDate()+6);
-  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' – '+end.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  return startStr+' – '+end.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
 }
 
 function fmtNum(n){
@@ -426,7 +438,7 @@ function populateWeekSelectors(){
   ['week-select-dash','week-select-input'].forEach(id=>{
     const sel=document.getElementById(id);
     sel.innerHTML='';
-    weeklyData.forEach(w=>{sel.innerHTML+=`<option value="${w.week_start}">${fmtWeek(w.week_start)}</option>`;});
+    weeklyData.forEach(w=>{sel.innerHTML+=`<option value="${w.week_start}">${fmtWeek(w.week_start,w.week_end)}</option>`;});
     if(weeklyData.length)sel.value=weeklyData[weeklyData.length-1].week_start;
   });
   if(weeklyData.length)loadWeekInput();
@@ -479,7 +491,7 @@ function renderDashboard(){
   } else {document.getElementById('best-wrap').innerHTML='';}
 
   // Gráfico
-  const labels=weeklyData.map(x=>fmtWeek(x.week_start));
+  const labels=weeklyData.map(x=>fmtWeek(x.week_start,x.week_end));
   if(chartInstance)chartInstance.destroy();
   const ctx=document.getElementById('views-chart').getContext('2d');
   chartInstance=new Chart(ctx,{
@@ -560,6 +572,8 @@ function renderDashboard(){
 
 function loadWeekInput(){
   const w=getW('week-select-input');if(!w)return;
+  document.getElementById('f-week-start').value=w.week_start||'';
+  document.getElementById('f-week-end').value=w.week_end||'';
   document.getElementById('f-tiktok').value=w.views_tiktok||'';
   document.getElementById('f-youtube').value=w.views_youtube||'';
   document.getElementById('f-instagram').value=w.views_instagram||'';
@@ -580,11 +594,11 @@ function loadWeekInput(){
 }
 
 function addNewWeek(){
-  const last=weeklyData.length?new Date(weeklyData[weeklyData.length-1].week_start+'T12:00:00'):new Date('2026-08-03T12:00:00');
-  const next=new Date(last);next.setDate(next.getDate()+7);
-  const ws=next.toISOString().slice(0,10);
+  const ws=document.getElementById('f-week-start').value;
+  const we=document.getElementById('f-week-end').value;
+  if(!ws){alert('Preencha a data de início primeiro!');return;}
   if(weeklyData.find(w=>w.week_start===ws)){alert('Semana já existe!');return;}
-  weeklyData.push({week_start:ws,views_tiktok:0,views_youtube:0,views_instagram:0,videos_postados:0,videos_produzidos:0,dias_falha:'',justificativa_falha:'',melhor_plataforma:'',top1_link:'',top1_plataforma:'',top1_views:0,top2_link:'',top2_plataforma:'',top2_views:0,top3_link:'',top3_plataforma:'',top3_views:0});
+  weeklyData.push({week_start:ws,week_end:we||'',views_tiktok:0,views_youtube:0,views_instagram:0,videos_postados:0,videos_produzidos:0,dias_falha:'',justificativa_falha:'',melhor_plataforma:'',top1_link:'',top1_plataforma:'',top1_views:0,top2_link:'',top2_plataforma:'',top2_views:0,top3_link:'',top3_plataforma:'',top3_views:0});
   populateWeekSelectors();
   document.getElementById('week-select-input').value=ws;
   loadWeekInput();
@@ -593,7 +607,9 @@ function addNewWeek(){
 async function saveWeekData(){
   const sel=document.getElementById('week-select-input');
   if(!sel.value)return;
-  const data={week_start:sel.value,
+  const weekStart=document.getElementById('f-week-start').value||sel.value;
+  const weekEnd=document.getElementById('f-week-end').value||'';
+  const data={week_start:weekStart,week_end:weekEnd,
     views_tiktok:parseInt(document.getElementById('f-tiktok').value)||0,
     views_youtube:parseInt(document.getElementById('f-youtube').value)||0,
     views_instagram:parseInt(document.getElementById('f-instagram').value)||0,
