@@ -283,25 +283,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
     <div class="admin-card">
       <div class="admin-card-title"><i class="ti ti-calendar"></i>Período da semana</div>
       <div class="form-grid-2" style="margin-bottom:.625rem;">
-        <div class="ff"><label>Data início</label><input type="date" id="f-week-start" style="color-scheme:dark;" onchange="checkExistingWeek()"/></div>
-        <div class="ff"><label>Data fim</label><input type="date" id="f-week-end" style="color-scheme:dark;"/></div>
+        <div class="ff"><label>Data início</label><input type="date" id="f-week-start" style="color-scheme:dark;" onchange="onWeekStartChange()"/></div>
+        <div class="ff"><label>Data fim (auto)</label><input type="date" id="f-week-end" style="color-scheme:dark;"/></div>
       </div>
+      <div id="week-status" style="font-size:11px;margin-top:2px;margin-bottom:.5rem;display:none;padding:8px 10px;border-radius:8px;"></div>
       <div class="ff">
-        <label>Ou carregar semana existente</label>
+        <label>Semanas existentes</label>
         <select id="week-select-input" onchange="loadWeekInput()" style="background:var(--bg3);border:1px solid var(--glass-b);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;-webkit-appearance:none;min-height:44px;width:100%;"></select>
       </div>
-      <div id="week-status" style="font-size:11px;color:var(--text3);margin-top:6px;display:none;"></div>
     </div>
 
     <div class="admin-card">
       <div class="admin-card-title"><i class="ti ti-eye"></i>Visualizações</div>
       <div class="form-col">
         <div class="form-grid-2">
-          <div class="ff"><label>TikTok views</label><input type="text" id="f-tiktok" placeholder="ex: 66.100" inputmode="numeric"/></div>
-          <div class="ff"><label>YouTube views</label><input type="text" id="f-youtube" placeholder="ex: 38.200" inputmode="numeric"/></div>
+          <div class="ff"><label>TikTok views</label><input type="text" id="f-tiktok" placeholder="ex: 66.100" inputmode="decimal" oninput="isDirty=true"/></div>
+          <div class="ff"><label>YouTube views</label><input type="text" id="f-youtube" placeholder="ex: 38.200" inputmode="decimal" oninput="isDirty=true"/></div>
         </div>
         <div class="form-grid-2">
-          <div class="ff"><label>Instagram views</label><input type="text" id="f-instagram" placeholder="ex: 12.000" inputmode="numeric"/></div>
+          <div class="ff"><label>Instagram views</label><input type="text" id="f-instagram" placeholder="ex: 12.000" inputmode="decimal"/></div>
           <div class="ff"><label>Melhor plataforma</label>
             <select id="f-melhor"><option value="">Selecione...</option><option value="tiktok">TikTok</option><option value="youtube">YouTube</option><option value="instagram">Instagram</option></select>
           </div>
@@ -313,10 +313,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
       <div class="admin-card-title"><i class="ti ti-users"></i>Seguidores totais</div>
       <div class="form-col">
         <div class="form-grid-2">
-          <div class="ff"><label>TikTok</label><input type="text" id="f-seg-tiktok" placeholder="ex: 2.800" inputmode="numeric"/></div>
-          <div class="ff"><label>YouTube</label><input type="text" id="f-seg-youtube" placeholder="ex: 229" inputmode="numeric"/></div>
+          <div class="ff"><label>TikTok</label><input type="text" id="f-seg-tiktok" placeholder="ex: 2.800" inputmode="decimal"/></div>
+          <div class="ff"><label>YouTube</label><input type="text" id="f-seg-youtube" placeholder="ex: 229" inputmode="decimal"/></div>
         </div>
-        <div class="ff" style="max-width:50%;padding-right:4px;"><label>Instagram</label><input type="text" id="f-seg-instagram" placeholder="ex: 5.400" inputmode="numeric"/></div>
+        <div class="ff" style="max-width:50%;padding-right:4px;"><label>Instagram</label><input type="text" id="f-seg-instagram" placeholder="ex: 5.400" inputmode="decimal"/></div>
       </div>
     </div>
 
@@ -324,8 +324,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
       <div class="admin-card-title"><i class="ti ti-video"></i>Produção</div>
       <div class="form-col">
         <div class="form-grid-2">
-          <div class="ff"><label>Vídeos postados</label><input type="number" id="f-postados" placeholder="0" inputmode="numeric"/></div>
-          <div class="ff"><label>Vídeos produzidos</label><input type="number" id="f-produzidos" placeholder="0" inputmode="numeric"/></div>
+          <div class="ff"><label>Vídeos postados</label><input type="number" id="f-postados" placeholder="ex: 84" inputmode="decimal"/></div>
+          <div class="ff"><label>Vídeos produzidos</label><input type="number" id="f-produzidos" placeholder="ex: 84" inputmode="decimal"/></div>
         </div>
         <div class="ff"><label>Dias que falharam</label><input type="text" id="f-dias-falha" placeholder="ex: 07/08, 09/08"/></div>
         <div class="ff"><label>Justificativa</label><textarea id="f-justificativa" placeholder="Motivo das falhas..."></textarea></div>
@@ -341,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
             <div class="ff"><label>Link</label><input type="text" id="f-top1-link" placeholder="https://..." inputmode="url"/></div>
             <div class="form-grid-2">
               <div class="ff"><label>Plataforma</label><select id="f-top1-plat"><option value="">...</option><option value="tiktok">TikTok</option><option value="youtube">YouTube</option><option value="instagram">Instagram</option></select></div>
-              <div class="ff"><label>Views</label><input type="number" id="f-top1-views" placeholder="0" inputmode="numeric"/></div>
+              <div class="ff"><label>Views</label><input type="number" id="f-top1-views" placeholder="ex: 45.000" inputmode="decimal"/></div>
             </div>
           </div>
         </div>
@@ -351,7 +351,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
             <div class="ff"><label>Link</label><input type="text" id="f-top2-link" placeholder="https://..." inputmode="url"/></div>
             <div class="form-grid-2">
               <div class="ff"><label>Plataforma</label><select id="f-top2-plat"><option value="">...</option><option value="tiktok">TikTok</option><option value="youtube">YouTube</option><option value="instagram">Instagram</option></select></div>
-              <div class="ff"><label>Views</label><input type="number" id="f-top2-views" placeholder="0" inputmode="numeric"/></div>
+              <div class="ff"><label>Views</label><input type="number" id="f-top2-views" placeholder="ex: 32.000" inputmode="decimal"/></div>
             </div>
           </div>
         </div>
@@ -361,7 +361,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
             <div class="ff"><label>Link</label><input type="text" id="f-top3-link" placeholder="https://..." inputmode="url"/></div>
             <div class="form-grid-2">
               <div class="ff"><label>Plataforma</label><select id="f-top3-plat"><option value="">...</option><option value="tiktok">TikTok</option><option value="youtube">YouTube</option><option value="instagram">Instagram</option></select></div>
-              <div class="ff"><label>Views</label><input type="number" id="f-top3-views" placeholder="0" inputmode="numeric"/></div>
+              <div class="ff"><label>Views</label><input type="number" id="f-top3-views" placeholder="ex: 18.000" inputmode="decimal"/></div>
             </div>
           </div>
         </div>
@@ -372,7 +372,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,san
     <div id="save-ok" class="save-ok"><i class="ti ti-circle-check"></i> Salvo com sucesso!</div>
   </div>
 
-  <div class="footer"><span>Roity © 2026</span><span>v1.3</span></div>
+  <div class="footer"><span>Roity © 2026</span><span>v1.4</span></div>
 </div>
 
 <script>
@@ -613,6 +613,13 @@ function renderDashboard(){
 
 function loadWeekInput(){
   const w=getW('week-select-input');if(!w)return;
+  loadWeekFromData(w);
+  const st=document.getElementById('week-status');
+  if(st){st.style.display='block';st.style.background='var(--glass-gold)';st.style.color='var(--gold)';
+  st.innerHTML='<i class="ti ti-calendar"></i> '+fmtWeek(w.week_start,w.week_end)+' carregado.';}
+}
+function _loadWeekInput_unused(){
+  const w=getW('week-select-input');if(!w)return;
   document.getElementById('f-week-start').value=w.week_start||'';
   document.getElementById('f-week-end').value=w.week_end||'';
   document.getElementById('f-tiktok').value=w.views_tiktok||'';
@@ -639,6 +646,41 @@ function loadWeekInput(){
   const st=document.getElementById('week-status');
   st.style.display='block';
   st.innerHTML='<i class="ti ti-check" style="color:var(--success2);"></i> Semana carregada: '+fmtWeek(w.week_start,w.week_end);
+}
+
+let isDirty=false;
+
+function onWeekStartChange(){
+  const ws=document.getElementById('f-week-start').value;
+  if(!ws)return;
+  // Auto-calcular data fim (+6 dias)
+  const start=new Date(ws+'T12:00:00');
+  const end=new Date(start);end.setDate(end.getDate()+6);
+  document.getElementById('f-week-end').value=end.toISOString().slice(0,10);
+  // Auto-selecionar no select se existir
+  const sel=document.getElementById('week-select-input');
+  const existing=weeklyData.find(w=>w.week_start===ws);
+  const st=document.getElementById('week-status');
+  if(existing){
+    sel.value=ws;
+    loadWeekFromData(existing);
+    st.style.display='block';st.style.background='var(--glass-gold)';st.style.color='var(--gold)';
+    st.innerHTML='<i class="ti ti-info-circle"></i> Semana existente carregada — edite e salve.';
+  } else {
+    sel.value='';
+    // Limpar campos para nova semana (exceto datas)
+    ['f-tiktok','f-youtube','f-instagram','f-postados','f-produzidos',
+     'f-dias-falha','f-top1-link','f-top1-views','f-top2-link','f-top2-views',
+     'f-top3-link','f-top3-views','f-seg-tiktok','f-seg-youtube','f-seg-instagram'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.value='';
+    });
+    ['f-melhor','f-top1-plat','f-top2-plat','f-top3-plat'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.value='';
+    });
+    document.getElementById('f-justificativa').value='';
+    st.style.display='block';st.style.background='var(--success-bg)';st.style.color='var(--success2)';
+    st.innerHTML='<i class="ti ti-plus"></i> Nova semana — preencha os dados e salve.';
+  }
 }
 
 function checkExistingWeek(){
@@ -704,10 +746,12 @@ function addNewWeek(){
 }
 
 async function saveWeekData(){
-  const sel=document.getElementById('week-select-input');
-  if(!sel.value)return;
-  const weekStart=document.getElementById('f-week-start').value||sel.value;
+  const weekStart=document.getElementById('f-week-start').value;
   const weekEnd=document.getElementById('f-week-end').value||'';
+  if(!weekStart){
+    alert('Preencha a data de início antes de salvar!');
+    return;
+  }
   const g=id=>document.getElementById(id).value;
   const data={week_start:weekStart,week_end:weekEnd,
     views_tiktok:parseNum(g('f-tiktok')),
@@ -727,10 +771,21 @@ async function saveWeekData(){
     updated_at:new Date().toISOString()};
   const{error}=await sb.from('tony_weekly_report').upsert(data,{onConflict:'week_start'});
   if(!error){
-    await loadAllData();populateWeekSelectors();
+    isDirty=false;
+    await loadAllData();
+    populateWeekSelectors();
+    // Selecionar a semana recém salva no dashboard
+    const selDash=document.getElementById('week-select-dash');
+    if(selDash)selDash.value=weekStart;
     const ok=document.getElementById('save-ok');
-    ok.style.display='flex';setTimeout(()=>{ok.style.display='none';},3000);
+    ok.style.display='flex';
+    const st=document.getElementById('week-status');
+    if(st){st.style.display='block';st.style.background='var(--success-bg)';st.style.color='var(--success2)';st.innerHTML='<i class="ti ti-circle-check"></i> Dados salvos com sucesso!';}
+    setTimeout(()=>{ok.style.display='none';},3000);
     renderDashboard();
+  } else {
+    const st=document.getElementById('week-status');
+    if(st){st.style.display='block';st.style.background='var(--danger-bg)';st.style.color='var(--danger2)';st.innerHTML='<i class="ti ti-alert-triangle"></i> Erro ao salvar. Tente novamente.';}
   }
 }
 
@@ -743,6 +798,14 @@ function switchTab(tab){
   if(tab==='dashboard')renderDashboard();
   if(tab==='input')loadWeekInput();
 }
+
+window.addEventListener('beforeunload',(e)=>{
+  if(isDirty){
+    e.preventDefault();
+    e.returnValue='Você tem dados não salvos. Tem certeza que quer sair?';
+    return e.returnValue;
+  }
+});
 
 window.addEventListener('DOMContentLoaded',async()=>{
   const saved=sessionStorage.getItem('tony_report_user');
